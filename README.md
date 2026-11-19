@@ -143,8 +143,7 @@ Acesse **http://localhost:8080** e entre com `ADMIN_LOGIN` / `ADMIN_SENHA`.
 | `MYSQL_ROOT_PASSWORD` | Senha root do MySQL | — |
 | `ADMIN_LOGIN` / `ADMIN_SENHA` | Administrador criado na primeira inicialização | `admin` / — |
 
-> ⚠️ As variáveis `MYSQL_*` são lidas **somente na criação do volume** do banco. Se alterá-las depois,
-> veja a seção de troubleshooting do [DEPLOY.md](DEPLOY.md).
+> ⚠️ As variáveis `MYSQL_*` são lidas **somente na criação do volume** do banco.
 
 #### Comandos úteis
 
@@ -155,8 +154,6 @@ docker compose up -d --build      # atualizar após mudanças no código
 docker compose down               # parar (os dados são mantidos)
 docker compose down -v            # parar e APAGAR todos os dados
 ```
-
-Backup, restauração, atualização em produção e solução de problemas estão no **[DEPLOY.md](DEPLOY.md)**.
 
 ## 👤 Autor
 
