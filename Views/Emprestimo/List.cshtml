@@ -1,0 +1,314 @@
+﻿@model LabRobotica.ViewModels.EmprestimoListViewModel;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Empréstimos";
+}
+
+<style>
+    body {
+        background-color: #f4f5f7;
+    }
+
+    .card {
+        border: none;
+        border-radius: 8px;
+    }
+
+    .table th {
+        font-weight: 600;
+        border-bottom-width: 1px;
+    }
+
+    .btn-purple {
+        background-color: #9111ed;
+        color: white;
+    }
+
+        .btn-purple:hover {
+            background-color: #780ec5;
+            color: white;
+        }
+
+    .empty-state {
+        color: #6c757d;
+        padding: 40px 0;
+    }
+</style>
+
+<div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <h3 class="fw-medium mb-0 fs-2">Empréstimos</h3>
+
+        <a href="/Emprestimo/Insert" class="btn btn-purple d-flex align-items-center gap-2 fs-5 fw-medium">
+            <i class="fa-solid fa-plus"></i> Novo Empréstimo
+        </a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h6 class="card-title text-muted mb-3 fs-4 fw-medium">
+                <i class="fa-solid fa-search"></i>  Filtros de Pesquisa
+            </h6>
+
+            <form method="get" asp-action="List" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-medium mb-1 fs-5">Aluno</label>
+                    <input type="text" id="filtroAluno" name="filtroAluno" class="form-control fs-5" placeholder="Buscar por aluno...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-medium mb-1 fs-5">Curso</label>
+                    <input type="text" id="filtroCurso" name="filtroCurso" class="form-control fs-5" placeholder="Buscar por curso...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-medium mb-1 fs-5">Finalidade</label>
+                    <select id="filtroFinalidade" name="filtroFinalidade" class="form-select fs-5">
+                        <option value="0" selected>Todos</option>
+                        <option value="1">Ensino</option>
+                        <option value="2">Pesquisa</option>
+                        <option value="3">Extensão</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-medium mb-1 fs-5">Item</label>
+                    <input type="text" id="filtroItem" name="filtroItem" class="form-control fs-5" placeholder="Buscar por item...">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-medium mb-1 fs-5">Tipo do Item</label>
+                    <select id="filtroTipoItem" name="filtroTipoItem" class="form-select fs-5">
+                        <option value="0" selected>Todos</option>
+                        <option value="1">Componente eletrônico</option>
+                        <option value="2">Equipamento</option>
+                        <option value="3">Outros</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-medium mb-1 fs-5">Data Retirada</label>
+                    <input type="date" id="filtroDataRetirada" name="filtroDataRetirada" class="form-control fs-5">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-medium mb-1 fs-5">Data Devolução</label>
+                    <input type="date" id="filtroDataDevolucao" name="filtroDataDevolucao" class="form-control fs-5">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-medium mb-1 fs-5">Status de Devolução</label>
+                    <select id="filtroStatus" name="filtroStatus" class="form-select fs-5">
+                        <option value="0" selected>Todos</option>
+                        <option value="1">Devolvido (sem baixas)</option>
+                        <option value="2">Pendente</option>
+                        <option value="3">Devolvido (com baixas)</option>
+                        <option value="4">Parcialmente devolvido</option>
+                    </select>
+                </div>
+                <button type="submit" class="d-none"></button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-borderless text-nowrap mb-0 text-center align-middle fs-5">
+                    <thead class="bg-light">
+                        <tr>
+                            <th scope="col" class="py-3 small">Aluno</th>
+                            <th scope="col" class="py-3 small">Email</th>
+                            <th scope="col" class="py-3 small">Telefone</th>
+                            <th scope="col" class="py-3 small">Curso</th>
+                            <th scope="col" class="py-3 small">Finalidade</th>
+                            <th scope="col" class="py-3 small">Item</th>
+                            <th scope="col" class="py-3 small">Qtd. Emp.</th>
+                            <th scope="col" class="py-3 small">Qtd. Dev.</th>
+                            <th scope="col" class="py-3 small">Data Retirada</th>
+                            <th scope="col" class="py-3 small">Data Devolução</th>
+                            <th scope="col" class="py-3 small text-start" style="min-width: 250px;">Descrição</th>
+                            <th scope="col" class="py-3 small">Status</th>
+                            <th scope="col" class="py-3 small">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model == null || !Model.List.Any())
+                        {
+                            <tr>
+                                <td colspan="13" class="empty-state text-muted py-5">
+                                    Nenhum empréstimo registrado
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr id="linhaSemResultados" style="display: none;">
+                                <td colspan="13" class="empty-state text-center text-muted py-4">
+                                    Nenhum item corresponde aos filtros pesquisados
+                                </td>
+                            </tr>
+                            @foreach (var item in Model.List)
+                            {
+                                <tr class="emprestimo-row"
+                                    data-aluno="@item.Aluno.ToLower()"
+                                    data-curso="@item.Curso.ToLower()"
+                                    data-finalidade="@item.Finalidade"
+                                    data-item="@item.ItemNome.ToLower()"
+                                    data-tipoitem="@item.ItemTipo"
+                                    data-dtaretirada="@item.DataRetirada.ToString("yyyy-MM-dd")"
+                                    data-dtadevolucao="@item.DataDevolucao.ToString("yyyy-MM-dd")"
+                                    data-status="@item.Status">
+                                    <td class="fw-medium">@item.Aluno</td>
+                                    <td>@item.Email</td>
+                                    <td>@item.Telefone</td>
+                                    <td>@item.Curso</td>
+                                    @switch (item.Finalidade)
+                                    {
+                                        case 1:
+                                            <td>Ensino</td>
+                                            break;
+                                        case 2:
+                                            <td>Pesquisa</td>
+                                            break;
+                                        case 3:
+                                            <td>Extensão</td>
+                                            break;
+                                        default:
+                                            <td><span class="text-muted">-</span></td>
+                                            break;
+                                    }
+                                    <td>@item.ItemNome</td>
+                                    <td>@item.QuantidadeEmprestada</td>
+                                    <td>@item.QuantidadeDevolvida</td>
+                                    <td>@item.DataRetirada.ToString("dd/MM/yyyy")</td>
+                                    @if (item.DataDevolucao.ToString("dd/MM/yyyy").Equals(DateTime.MinValue.ToString("dd/MM/yyyy")))
+                                    {
+                                        <td>-</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@item.DataDevolucao.ToString("dd/MM/yyyy")</td>                    
+                                    }
+
+                                    <td class="text-start" style="white-space: normal; word-break: break-word; min-width: 250px;">
+                                        @(item.Descricao ?? "-")
+                                    </td>
+
+                                    <td class="text-center align-middle">
+                                        @switch (item.Status)
+                                        {
+                                            case 1:
+                                                <i class="fa-solid fa-thumbs-up text-success fs-5" title="Todos os itens entregues em perfeito estado"></i>
+                                                break;
+                                            case 2:
+                                                <i class="fa-solid fa-thumbs-down text-danger fs-5" title="Nenhum item entregue"></i>
+                                                break;
+                                            case 3:
+                                                <i class="fa-solid fa-thumbs-up text-danger fs-5" title="Todos os itens entregues com itens estragados"></i>
+                                                break;
+                                            case 4:
+                                                <i class="fa-solid fa-thumbs-up fa-rotate-90 text-warning fs-5" title="Entrega parcial sem itens estragados"></i>
+                                                break;
+                                            case 5:
+                                                <i class="fa-solid fa-thumbs-up fa-rotate-90 fs-5" style="color: #ff4500;" title="Entrega parcial com itens estragados"></i>
+                                                break;
+                                            default:
+                                                <span class="text-muted">-</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.Status != 1 && item.Status != 3)
+                                        {
+                                            <a href="/Emprestimo/Edit/@item.Id" class="text-primary text-decoration-none me-2" title="Editar">
+                                                <i class="fa-solid fa-box"></i> Devolver
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="text-muted text-decoration-none me-2" style="cursor: not-allowed;" title="Todos os itens devolvidos">
+                                                <i class="fa-solid fa-box"></i> Devolver
+                                            </a>
+                                        }
+                                        
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const inputAluno = document.getElementById('filtroAluno');
+            const inputCurso = document.getElementById('filtroCurso');
+            const selectFinalidade = document.getElementById('filtroFinalidade');
+            const inputItem = document.getElementById('filtroItem');
+            const selectTipoItem = document.getElementById('filtroTipoItem');
+            const inputDataRetirada = document.getElementById('filtroDataRetirada');
+            const inputDataDevolucao = document.getElementById('filtroDataDevolucao');
+            const selectStatus = document.getElementById('filtroStatus');
+
+            const linhas = document.querySelectorAll('.emprestimo-row');
+            const linhaSemResultados = document.getElementById('linhaSemResultados');
+
+            function filtrarTabela() {
+                const valorAluno = inputAluno.value.toLowerCase().trim();
+                const valorCurso = inputCurso.value.toLowerCase().trim();
+                const valorFinalidade = selectFinalidade.value;
+                const valorItem = inputItem.value.toLowerCase().trim();
+                const valorTipoItem = selectTipoItem.value;
+                const valorDataRetirada = inputDataRetirada.value;
+                const valorDataDevolucao = inputDataDevolucao.value;
+                const valorStatus = selectStatus.value;
+
+                let linhasVisiveis = 0;
+
+                linhas.forEach(function (linha) {
+                    const nomeAluno = linha.getAttribute('data-aluno') || '';
+                    const curso = linha.getAttribute('data-curso') || '';
+                    const finalidade = linha.getAttribute('data-finalidade') || '';
+                    const item = linha.getAttribute('data-item') || '';
+                    const tipoItem = linha.getAttribute('data-tipoitem') || '';
+                    const dataRetirada = linha.getAttribute('data-dtaretirada') || '';
+                    const dataDevolucao = linha.getAttribute('data-dtadevolucao') || '';
+                    const status = linha.getAttribute('data-status') || '';
+
+                    const bateAluno = nomeAluno.includes(valorAluno);
+                    const bateCurso = curso.includes(valorCurso);
+                    const bateFinalidade = (valorFinalidade === '0' || finalidade === valorFinalidade);
+                    const bateItem = item.includes(valorItem);
+                    const bateTipoItem = (valorTipoItem === '0' || tipoItem === valorTipoItem);
+                    const bateDataRetirada = (valorDataRetirada === '' || dataRetirada === valorDataRetirada);
+                    const bateDataDevolucao = (valorDataDevolucao === '' || dataDevolucao === valorDataDevolucao);
+                    const bateStatus = (valorStatus === '0' || status === valorStatus || (valorStatus === '4' && status === '5'));
+
+                    if (bateAluno && bateCurso && bateFinalidade && bateItem && bateTipoItem && bateDataRetirada && bateDataDevolucao && bateStatus) {
+                        linha.style.display = '';
+                        linhasVisiveis++;
+                    } else {
+                        linha.style.display = 'none';
+                    }
+                });
+
+                if (linhaSemResultados) {
+                    if (linhasVisiveis === 0 && linhas.length > 0) {
+                        linhaSemResultados.style.display = '';
+                    } else {
+                        linhaSemResultados.style.display = 'none';
+                    }
+                }
+            }
+
+            inputAluno.addEventListener('input', filtrarTabela);
+            inputCurso.addEventListener('input', filtrarTabela);
+            selectFinalidade.addEventListener('change', filtrarTabela);
+            inputItem.addEventListener('input', filtrarTabela);
+            selectTipoItem.addEventListener('change', filtrarTabela);
+            inputDataRetirada.addEventListener('change', filtrarTabela);
+            inputDataDevolucao.addEventListener('change', filtrarTabela);
+            selectStatus.addEventListener('change', filtrarTabela);
+        });
+    </script>
+}

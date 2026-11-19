@@ -1,0 +1,124 @@
+﻿@model LabRobotica.ViewModels.UsuarioListViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Usuários";
+}
+
+<style>
+    body {
+        background-color: #f4f5f7;
+    }
+
+    .card {
+        border: none;
+        border-radius: 8px;
+    }
+
+    .table th {
+        font-weight: 600;
+        border-bottom-width: 1px;
+    }
+
+    .empty-state {
+        color: #6c757d;
+        padding: 40px 0;
+    }
+</style>
+
+<div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <h3 class="fw-medium mb-0 fs-2">Usuários do Sistema</h3>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a href="/Usuario/Logs" class="btn btn-outline-secondary d-flex align-items-center gap-2 fs-5 fw-medium">
+                <i class="fa-solid fa-list-check"></i> Logs de Auditoria
+            </a>
+            <a href="/Usuario/Insert" class="btn btn-primary d-flex align-items-center gap-2 fs-5 fw-medium">
+                <i class="fa-solid fa-plus"></i> Novo Usuário
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show small py-2 px-3 mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Erro"]
+            <button type="button" class="btn-close p-2 small" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    else if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show small py-2 px-3 mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Sucesso"]
+            <button type="button" class="btn-close p-2 small" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-borderless mb-0 text-center fs-5">
+                    <thead class="bg-light">
+                        <tr>
+                            <th scope="col" class="py-3">Login</th>
+                            <th scope="col" class="py-3">Perfil</th>
+                            <th scope="col" class="py-3">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.List == null || !Model.List.Any())
+                        {
+                            <tr>
+                                <td colspan="2" class="empty-state text-muted py-4">
+                                    Nenhum usuário cadastrado
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var usuario in Model.List)
+                            {
+                                <tr>
+                                    <td>@usuario.Login</td>
+                                    <td>
+                                        @if (usuario.Administrador)
+                                        {
+                                            <span class="badge rounded-pill text-bg-primary px-3 py-2">Administrador</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge rounded-pill text-bg-secondary px-3 py-2">Usuário Comum</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a href="/Usuario/LogsIndividual/@usuario.Id" class="text-primary text-decoration-none me-2" title="Ver logs">
+                                            <i class="fa-solid fa-file-lines"></i>
+                                        </a>
+
+                                        <form action="/Usuario/Delete/@usuario.Id" method="post" class="me-2" style="display:inline;">
+                                            <button type="submit" class="text-danger bg-transparent border-0 p-0" title="Remover" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                document.querySelectorAll('.alert').forEach(function (alerta) {
+                    new bootstrap.Alert(alerta).close();
+                });
+            }, 5000);
+        });
+    </script>
+}

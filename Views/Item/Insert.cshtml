@@ -1,0 +1,56 @@
+﻿@model LabRobotica.ViewModels.ItemListViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background-color: #f4f5f7;
+    }
+
+    .card {
+        border: none;
+        border-radius: 8px;
+    }
+</style>
+
+<div id="NovoItem" tabindex="-1">
+    <div class="card dialog dialog-centered">
+        <div class="content border-0 shadow">
+            <div class="header border-bottom-0 pt-4 px-4">
+                <h5 class="title fw-semibold fs-4" id="NovoItemLabel">Novo Item</h5>
+            </div>
+            <div class="body px-4 pb-4">
+
+                <form action="/Item/Insert" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-medium fs-5" asp-for="Nome">Nome</label>
+                        <input type="text" class="form-control" asp-for="Nome" name="Nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium fs-5" asp-for="Marca">Marca</label>
+                        <input type="text" class="form-control" asp-for="Marca" name="Marca" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium fs-5" asp-for="Tipo">Tipo</label>
+                        <select class="form-select" asp-for="Tipo" name="Tipo" required>
+                            <option value="1">Componente Eletrônico</option>
+                            <option value="2">Equipamento</option>
+                            <option value="3">Outros</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-medium fs-5" asp-for="Descricao">Descrição</label>
+                        <textarea class="form-control" rows="3" asp-for="Descricao" name="Descricao"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="/Item/List" class="btn btn-outline-secondary px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary px-4">Cadastrar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

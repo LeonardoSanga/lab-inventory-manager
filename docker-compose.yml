@@ -1,0 +1,49 @@
+name: labrobotica
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: labrobotica-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Defina MYSQL_ROOT_PASSWORD no arquivo .env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-LabRoboticaDB}
+      MYSQL_USER: ${MYSQL_USER:-labrobotica}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Defina MYSQL_PASSWORD no arquivo .env}
+      TZ: America/Sao_Paulo
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - db_data:/var/lib/mysql
+    # O banco NÃO é exposto para fora do Docker. Para acessar com Workbench/DBeaver,
+    # descomente as linhas abaixo (e use uma senha forte).
+    # ports:
+    #   - "3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  app:
+    build: .
+    image: labrobotica-app:latest
+    container_name: labrobotica-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=db;Port=3306;Database=${MYSQL_DATABASE:-LabRoboticaDB};Uid=${MYSQL_USER:-labrobotica};Pwd=${MYSQL_PASSWORD};AllowPublicKeyRetrieval=True;"
+      Database__MigrateOnStartup: "true"
+      Admin__Login: ${ADMIN_LOGIN:-admin}
+      Admin__Senha: ${ADMIN_SENHA:?Defina ADMIN_SENHA no arquivo .env}
+      TZ: America/Sao_Paulo
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    volumes:
+      - app_keys:/app/keys
+
+volumes:
+  db_data:
+  app_keys:

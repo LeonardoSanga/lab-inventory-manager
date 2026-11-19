@@ -1,0 +1,208 @@
+﻿@using System.Net.NetworkInformation
+@using LabRobotica.ViewModels
+@model LabRobotica.ViewModels.ItemListViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <style>
+        body {
+            background-color: #f4f5f7;
+        }
+
+        .card {
+            border: none;
+            border-radius: 8px;
+        }
+
+        .table th {
+            font-weight: 600;
+            border-bottom-width: 1px;
+        }
+
+        .empty-state {
+            color: #6c757d;
+            padding: 40px 0;
+        }
+    </style>
+
+    <div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+            <h3 class="titulo-tela fs-2 fw-medium mb-0">Gerenciamento de Itens</h3>
+            <a class="btn btn-primary d-flex align-items-center gap-2 fs-5 fw-medium" href="/Item/Insert/0">
+                <i class="fa-solid fa-plus"></i> Novo Item
+            </a>
+        </div>
+
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show small py-2 px-3 mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Erro"]
+            <button type="button" class="btn-close p-2 small" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    } else if(TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show small py-2 px-3 mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Sucesso"]
+            <button type="button" class="btn-close p-2 small" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+            <h6 class="card-title text-muted mb-3 fs-4 fw-medium">
+                    <i class="fa-solid fa-search"></i>  Filtros de Pesquisa
+                </h6>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-medium mb-1 fs-5">Nome</label>
+                        <input type="text" id="filtroNome" class="form-control fs-5" placeholder="Buscar por nome...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-medium mb-1 fs-5">Marca</label>
+                        <input type="text" id="filtroMarca" class="form-control fs-5" placeholder="Buscar por marca...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-medium mb-1 fs-5">Tipo</label>
+                        <select id="filtroTipo" class="form-select fs-5">
+                            <option value="0" selected>Todos</option>
+                            <option value="1">Componente Eletrônico</option>
+                            <option value="2">Equipamento</option>
+                            <option value="3">Outros</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-borderless mb-0 text-center fs-5">
+                    <thead class="bg-light">
+                        <tr>
+                            <th scope="col" class="py-3">Nome</th>
+                            <th scope="col" class="py-3">Marca</th>
+                            <th scope="col" class="py-3">Tipo</th>
+                            <th scope="col" class="py-3">Descrição</th>
+                            <th scope="col" class="py-3">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabela">
+                        @if (Model?.List == null || !Model.List.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="empty-state text-muted py-4">
+                                    Nenhum item cadastrado
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr id="linhaSemResultados" style="display: none;">
+                                <td colspan="5" class="empty-state text-muted py-4">
+                                    Nenhum item corresponde aos filtros pesquisados
+                                </td>
+                            </tr>
+
+                            @foreach (ItemListViewModel item in Model.List)
+                            {
+                                <tr class="item-row"
+                                    data-nome="@item.Nome.ToLower()"
+                                    data-marca="@item.Marca?.ToLower()"
+                                    data-tipo="@item.Tipo">
+
+                                    <td>@item.Nome</td>
+                                    <td>@item.Marca</td>
+                                    @if (item.Tipo == 1)
+                                    {
+                                        <td>Componente Eletrônico</td>
+                                    } else if (item.Tipo == 2)
+                                    {
+                                        <td>Equipamento</td>
+                                    } else
+                                    {
+                                        <td>Outros</td>
+                                    } 
+                                    <td>@item.Descricao</td>
+                                    <td>
+                                        <a href="/Item/Edit/@item.Id" class="text-decoration-none me-2" title="Editar">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+
+                                        <form action="/Item/Delete/@item.Id" method="post" class="me-2" style="display:inline;">
+                                            <button type="submit" class="text-danger bg-transparent border-0 p-0" title="Remover" onclick="return confirm('Tem certeza que deseja excluir este item?');">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+        
+    </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tempoExibicao = 5000;
+
+            setTimeout(function () {
+                const alertas = document.querySelectorAll('.alert');
+
+                alertas.forEach(function (alerta) {
+                    const bsAlert = new bootstrap.Alert(alerta);
+                    bsAlert.close();
+                });
+            }, tempoExibicao);
+
+            // Filtros
+            const inputNome = document.getElementById('filtroNome');
+            const inputMarca = document.getElementById('filtroMarca');
+            const selectTipo = document.getElementById('filtroTipo');
+            const linhas = document.querySelectorAll('.item-row');
+            const linhaSemResultados = document.getElementById('linhaSemResultados');
+
+            function filtrarTabela() {
+                const valorNome = inputNome.value.toLowerCase().trim();
+                const valorMarca = inputMarca.value.toLowerCase().trim();
+                const valorTipo = selectTipo.value;
+
+                let linhasVisiveis = 0;
+
+                linhas.forEach(function (linha) {
+                    const nomeItem = linha.getAttribute('data-nome') || '';
+                    const marcaItem = linha.getAttribute('data-marca') || '';
+                    const tipoItem = linha.getAttribute('data-tipo') || '';
+
+                    const bateNome = nomeItem.includes(valorNome);
+                    const bateMarca = marcaItem.includes(valorMarca);
+                    const bateTipo = (valorTipo == '0' || tipoItem == valorTipo);
+
+                    if (bateNome && bateMarca && bateTipo) {
+                        linha.style.display = ''; 
+                        linhasVisiveis++;
+                    } else {
+                        linha.style.display = 'none';
+                    }
+                });
+
+                if (linhaSemResultados) {
+                    if (linhasVisiveis === 0 && linhas.length > 0) {
+                        linhaSemResultados.style.display = '';
+                    } else {
+                        linhaSemResultados.style.display = 'none';
+                    }
+                }
+            }
+
+            inputNome.addEventListener('input', filtrarTabela);
+            inputMarca.addEventListener('input', filtrarTabela);
+            selectTipo.addEventListener('change', filtrarTabela);
+        });
+    </script>
+}

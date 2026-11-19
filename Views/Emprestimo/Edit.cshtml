@@ -1,0 +1,132 @@
+﻿@model LabRobotica.ViewModels.EmprestimoListViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Registrar Devolução";
+}
+
+<style>
+    body {
+        background-color: #f4f5f7;
+    }
+
+    .card {
+        border: none;
+        border-radius: 8px;
+    }
+
+    .info-box {
+        background-color: #f4f7fb;
+        border-radius: 8px;
+    }
+    
+    .btn-success-custom {
+        background-color: #00a650;
+        border-color: #00a650;
+        color: white;
+    }
+    .btn-success-custom:hover {
+        background-color: #008f45;
+        border-color: #008f45;
+        color: white;
+    }
+    
+    .btn-close-custom {
+        background: transparent;
+        border: none;
+        font-size: 1.25rem;
+        color: #6c757d;
+        cursor: pointer;
+    }
+    .btn-close-custom:hover {
+        color: #343a40;
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-sm border-0 rounded-4" style="width: 100%; max-width: 480px;">
+        
+        <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-medium mb-0 text-dark">Registrar Devolução</h5>
+        </div>
+
+        <div class="card-body px-4 pb-4">
+            
+            <div class="info-box p-3 mb-4 text-dark">
+                <div class="mb-1 fs-6">
+                    Aluno: <span class="fw-medium">@Model.Aluno</span>
+                </div>
+                <div class="mb-1">
+                    Quantidade Emprestada: <span class="fw-bold">@Model.QuantidadeEmprestada</span>
+                </div>
+                <div class="mb-1 fs-6">
+                    Já Devolvida: <span class="fw-medium">@Model.QuantidadeDevolvida</span>
+                </div>
+                @{
+                    var qtdRestante = Model.QuantidadeEmprestada - Model.QuantidadeDevolvida;
+                }
+                <div class="fs-6">
+                    Restante: <span class="fw-medium">@qtdRestante</span>
+                </div>
+            </div>
+
+            <form action="/Emprestimo/Edit" method="post">
+                <input type="text" hidden asp-for="Id" name="Id" value="@Model.Id">
+
+                <div class="mb-3">
+                    <label class="form-label fw-medium fs-6 mb-1">Quantidade Devolvida</label>
+                    <input type="number" class="form-control" asp-for="QuantidadeDevolvida" name="QuantidadeDevolvida" value="@qtdRestante" min="1" max="@qtdRestante" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-medium fs-6 mb-1">Quantidade Estragada</label>
+                    <input type="number" class="form-control" asp-for="QuantidadeEstragada" name="QuantidadeEstragada" value="0" min="0" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-medium fs-6">Data</label>
+                    <input type="date" class="form-control" name="DataDevolucao" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-medium fs-6 mb-1">Descrição</label>
+                    <textarea class="form-control" asp-for="Descricao" name="Descricao" rows="3" placeholder="Descreva o estado dos itens devolvidos"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/Emprestimo/List" class="btn btn-outline-secondary px-4 py-2 bg-white fw-medium text-dark border-secondary-subtle rounded-3">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success-custom px-4 py-2 fw-medium rounded-3">
+                        Confirmar Devolução
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputDevolvida = document.querySelector('input[name="QuantidadeDevolvida"]');
+            const inputEstragada = document.querySelector('input[name="QuantidadeEstragada"]');
+
+            // Regra de validação no Front-End:
+            // A quantidade estragada não pode ser maior do que a quantidade que está sendo devolvida.
+            inputDevolvida.addEventListener('input', function () {
+                inputEstragada.setAttribute('max', this.value);
+                if (parseInt(inputEstragada.value) > parseInt(this.value)) {
+                    inputEstragada.value = this.value;
+                }
+            });
+
+            inputEstragada.addEventListener('input', function () {
+                const maxPermitido = parseInt(inputDevolvida.value) || 0;
+                if (parseInt(this.value) > maxPermitido) {
+                    this.value = maxPermitido;
+                }
+            });
+        });
+    </script>
+}

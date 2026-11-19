@@ -1,0 +1,93 @@
+﻿@model LabRobotica.ViewModels.RelatorioPendentesViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Relatório de Pendentes";
+}
+
+<style>
+    body {
+        background-color: #f4f5f7;
+    }
+
+    .card {
+        border: none;
+        border-radius: 8px;
+    }
+
+    .table th {
+        font-weight: 600;
+        border-bottom-width: 1px;
+    }
+
+    .empty-state {
+        color: #6c757d;
+        padding: 40px 0;
+    }
+
+    @@media print {
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+
+<div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <h3 class="fw-medium mb-0 fs-2">Relatório de Itens Pendentes</h3>
+
+        <div class="d-flex flex-wrap gap-2 no-print">
+            <a href="/Relatorio/Itens" class="btn btn-outline-secondary d-flex align-items-center gap-2 fs-5 fw-medium">
+                <i class="fa-solid fa-boxes-stacked"></i> Ver Itens
+            </a>
+            <a href="/Relatorio/PendentesCsv" class="btn btn-outline-primary d-flex align-items-center gap-2 fs-5 fw-medium">
+                <i class="fa-solid fa-file-csv"></i> Exportar CSV
+            </a>
+            <button type="button" class="btn btn-primary d-flex align-items-center gap-2 fs-5 fw-medium" onclick="window.print()">
+                <i class="fa-solid fa-print"></i> Imprimir
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-borderless mb-0 text-center fs-5">
+                    <thead class="bg-light">
+                        <tr>
+                            <th scope="col" class="py-3 text-start">Nome do Aluno</th>
+                            <th scope="col" class="py-3">Telefone</th>
+                            <th scope="col" class="py-3 text-start">Item Emprestado</th>
+                            <th scope="col" class="py-3">Data do Empréstimo</th>
+                            <th scope="col" class="py-3">Quantidade Emprestada</th>
+                            <th scope="col" class="py-3">Quantidade Pendente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.List == null || !Model.List.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="empty-state text-muted py-4">
+                                    Nenhum empréstimo pendente de devolução
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var linha in Model.List)
+                            {
+                                <tr>
+                                    <td class="text-start fw-medium">@linha.NomeAluno</td>
+                                    <td>@linha.TelefoneAluno</td>
+                                    <td class="text-start">@linha.ItemNome</td>
+                                    <td>@linha.DataEmprestimo.ToString("dd/MM/yyyy")</td>
+                                    <td>@linha.QuantidadeEmprestada</td>
+                                    <td class="text-warning fw-medium">@linha.QuantidadePendente</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

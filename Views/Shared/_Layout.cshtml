@@ -1,0 +1,244 @@
+﻿﻿
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LabRobótica</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+
+    <style>
+        .conteudo-principal {
+            max-width: 100% !important;
+            padding-left: 4vw !important;
+            padding-right: 4vw !important;
+        }
+
+        /* Faixa do título */
+        #page-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 2rem;
+            gap: 1rem;
+        }
+
+        #page-header {
+            display: block;
+            min-width: 0;
+        }
+
+            #page-header h1 {
+                font-size: 2rem;
+                font-weight: 600;
+                color: #1f2937;
+                margin: 0;
+            }
+
+        /* Botão hambúrguer (visível apenas em telas pequenas) */
+        .menu-toggler {
+            display: none;
+            border: 1px solid #d1d5db;
+            background: transparent;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 1.25rem;
+            color: #1f2937;
+            flex: 0 0 auto;
+        }
+
+            .menu-toggler:hover {
+                background: #f9fafb;
+            }
+
+        /* Em telas grandes o menu fica sempre visível (não é um "collapse" de verdade) */
+        @@media (min-width: 992px) {
+            #menuPrincipal.collapse:not(.show) {
+                display: block;
+            }
+        }
+
+        /* Menu de navegação */
+        .nav-tabs-custom {
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+            .nav-tabs-custom .nav-item a {
+                font-size: 1.2em;
+            }
+
+            .nav-tabs-custom .nav-link {
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.9rem 1rem;
+                color: #4b5563;
+                font-weight: 500;
+                font-size: 1rem;
+                border-bottom: 3px solid transparent;
+                transition: all 0.15s ease;
+            }
+
+                .nav-tabs-custom .nav-link:hover {
+                    color: #2563eb;
+                    background: #f9fafb;
+                }
+
+                .nav-tabs-custom .nav-link.active {
+                    color: #2563eb;
+                    border-bottom-color: #2563eb;
+                }
+
+        /* Botão Sair */
+        #btn-logout .nav-link {
+            font-size: 1.2em;
+            color: #ef4444 !important;
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+            margin: 0.4rem 0;
+        }
+
+            #btn-logout .nav-link:hover {
+                background: #f9fafb;
+                color: #2563eb !important;
+            }
+
+        /* ===== Responsividade para celulares e tablets ===== */
+        @@media (max-width: 991.98px) {
+            /* Mostra o botão hambúrguer e esconde o menu até ele ser aberto */
+            .menu-toggler {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #menuPrincipal {
+                border-top: 1px solid #e5e7eb;
+            }
+
+            /* O menu vira uma lista vertical dentro do collapse */
+            .nav-tabs-custom {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0.5rem 1rem;
+                border-top: none;
+            }
+
+                .nav-tabs-custom .nav-item,
+                .nav-tabs-custom .dropdown-menu {
+                    width: 100%;
+                }
+
+                .nav-tabs-custom .nav-link {
+                    border-bottom: none;
+                    border-radius: 6px;
+                }
+
+                    .nav-tabs-custom .nav-link.active {
+                        background: #eff6ff;
+                        border-bottom: none;
+                    }
+
+            #btn-logout {
+                margin-left: 0 !important;
+                margin-top: 0.5rem;
+                border-top: 1px solid #e5e7eb;
+                padding-top: 0.5rem;
+            }
+
+                #btn-logout .nav-link {
+                    margin: 0;
+                    justify-content: center;
+                }
+        }
+
+        @@media (max-width: 575.98px) {
+            #page-header-bar {
+                padding: 1rem 1.25rem;
+            }
+
+            #page-header h1 {
+                font-size: 1.15rem;
+                line-height: 1.3;
+            }
+
+            .conteudo-principal {
+                padding-left: 4vw !important;
+                padding-right: 4vw !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <header class="bg-white border-bottom mb-4 shadow-sm">
+
+        <div id="page-header-bar">
+            <a id="page-header" class="text-decoration-none" asp-controller="Home" asp-action="Index">
+                <h1>Gerenciamento - Laboratório de Robótica</h1>
+            </a>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <button class="menu-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menu de navegação">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            }
+        </div>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            var controllerAtual = ViewContext.RouteData.Values["controller"]?.ToString();
+
+            <div class="collapse" id="menuPrincipal">
+                <ul class="nav nav-tabs-custom mb-0">
+                    <li class="nav-item">
+                        <a class="nav-link @(controllerAtual == "Item" ? "active" : "")" href="/Item/List"><i class="fa-solid fa-cube"></i> Itens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(controllerAtual == "Estoque" ? "active" : "")" href="/Estoque/List"><i class="fa-solid fa-box"></i> Estoque</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(controllerAtual == "Emprestimo" ? "active" : "")" href="/Emprestimo/List"><i class="fa-solid fa-user-group"></i> Empréstimos</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle @(controllerAtual == "Relatorio" ? "active" : "")" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-chart-column"></i> Relatórios
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/Relatorio/Itens">Quantidade de Itens</a></li>
+                            <li><a class="dropdown-item" href="/Relatorio/Pendentes">Itens Pendentes</a></li>
+                        </ul>
+                    </li>
+                    @if (User.IsInRole("Administrador"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(controllerAtual == "Usuario" ? "active" : "")" href="/Usuario/List"><i class="fa-solid fa-user-shield"></i> Usuários</a>
+                        </li>
+                    }
+
+                    <li id="btn-logout" class="nav-item ms-auto">
+                        <form action="/Auth/Logout" method="post">
+                            <button type="submit" class="nav-link border-0 bg-transparent"><i class="fa-solid fa-square-arrow-up-right"></i> Sair</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        }
+
+    </header>
+
+    <div class="container-fluid conteudo-principal">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

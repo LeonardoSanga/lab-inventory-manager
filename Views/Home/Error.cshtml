@@ -1,0 +1,24 @@
+@{
+    Layout = null;
+    var codigo = (int)ViewBag.Codigo;
+}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Erro @codigo - LabRobótica</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { background-color: #f4f5f7; }
+        .card { border: none; border-radius: 8px; max-width: 520px; }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center min-vh-100">
+    <div class="card shadow-sm p-4 text-center">
+        <h1 class="display-5 fw-semibold text-secondary mb-2">@codigo</h1>
+        <p class="fs-5 mb-4">@ViewBag.Mensagem</p>
+        <a href="/" class="btn btn-primary">Voltar ao início</a>
+    </div>
+</body>
+</html>
